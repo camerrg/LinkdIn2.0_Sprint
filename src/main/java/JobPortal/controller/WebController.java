@@ -1,5 +1,6 @@
 package JobPortal.controller;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,14 +22,19 @@ public class WebController {
 
 	@Autowired
 	ApplicantRepository appRepo;
+	@Autowired
 	EmployerRepository empRepo;
+	@Autowired
 	JobRepository jobRepo;
 
-	@GetMapping("/index")
+	@GetMapping("/homePage")
 	public String goToIndex() {
-		return "index";
+		return "addNewApp";
 	}
 
+	
+	//-------APPLICANT--------------------
+	
 	@GetMapping("/appLogin")
 	public String appLogin(@PathVariable("username") String username, Model model) {
 
@@ -55,6 +61,8 @@ public class WebController {
 		return appLogin(username, model);
 	}
 
+	//-------JOB--------------------
+	
 	@GetMapping("/addNewJob")
 	public String addNewJob(Model model) {
 		Job j = new Job();
@@ -70,10 +78,11 @@ public class WebController {
 
 	@PostMapping("addNewJob")
 	public String addNewJob(@ModelAttribute Job j, Model model) {
+		
 		jobRepo.save(j);
 
-		// return to company profile, with list of their jobs
-		return "index";
+		// return to applicant profile, with list of their jobs
+		return goToIndex();
 	}
 
 	@GetMapping("/showJobList")
@@ -89,7 +98,7 @@ public class WebController {
 		Applicant c = appRepo.findById(id).orElse(null);
 		System.out.println("ITEM TO EDIT: " + c.toString());
 		model.addAttribute("newApplicant", c);
-		return "applicantHomePage";
+		return "editAppProfile";
 	}
 
 	@GetMapping("/deleteApp/{id}")
@@ -105,6 +114,38 @@ public class WebController {
 		Job j = jobRepo.findById(jobId).orElse(null);
 		c.getJobsAppliedFor().remove(j);
 		return "applicantHomePage";
+	}
+	
+	
+	//-------EMPLOYER--------------------
+	
+	@GetMapping("/empLogin")
+	public String empLogin(@PathVariable("company") String company, Model model) {
+
+		Employer emp = empRepo.findAppByCompany(company);
+
+		model.addAttribute("employer", emp);
+		return "employerHomePage";
+	}
+	
+	@GetMapping("/createNewEmployer")
+	public String addNewCompany(Model model) {
+		Employer emp = new Employer();
+		
+		model.addAttribute("newEmployer", emp);
+		
+		return "createNewEmployer";
+	}
+	
+	@PostMapping("createNewEmployer")
+	public String addNewCompany(@ModelAttribute Employer emp, Model model) {
+		
+		empRepo.save(emp);
+		
+		String comp = emp.getCompany();
+
+		// return to company profile, with list of their jobs
+		return empLogin(comp, model);
 	}
 
 }
