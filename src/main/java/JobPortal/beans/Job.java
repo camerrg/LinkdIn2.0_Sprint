@@ -14,6 +14,9 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+
 
 @Entity
 public class Job {
@@ -24,12 +27,13 @@ public class Job {
 	@Column(columnDefinition="VARCHAR(2000)")
 	private String jobdesc;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "employerId")
 	private Employer employer;
 	
 	
 	@ManyToMany(mappedBy = "jobsAppliedFor")
+
 	private Set<Applicant> jobApplicants;
 
 	public Job() {

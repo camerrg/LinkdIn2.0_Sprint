@@ -6,6 +6,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -20,7 +25,8 @@ public class Applicant {
 	private String educationLevel;
 	
 	@ManyToMany
-	private Set<Job> jobsAppliedFor;
+	@Cascade(CascadeType.REMOVE)
+	public Set<Job> jobsAppliedFor;
 
 	public Applicant() {
 		super();
@@ -75,11 +81,17 @@ public class Applicant {
 	}
 	
 	public void addJobAppliedFor(Job j) {
-		jobsAppliedFor.add(j);
+		this.jobsAppliedFor.add(j);
+		j.getJobApplicants().add(this);
 	}
 	
 	public void deleteJobAppliedFor(Job j) {
-		jobsAppliedFor.remove(j);
+		this.jobsAppliedFor.remove(j);
+		j.getJobApplicants().remove(this);
+	}
+	
+	public void addJobListAppliedFor(List<Job> jobs) {
+		jobsAppliedFor.addAll(jobs);
 	}
 
 	public Applicant(String username, String name, String educationLevel, String address) {
@@ -93,8 +105,8 @@ public class Applicant {
 
 	@Override
 	public String toString() {
-		return "Applicant [applicantId=" + applicantId + ", name=" + name + ", address=" + address + ", educationLevel="
-				+ educationLevel; // + ", jobsAppliedFor=" + jobsAppliedFor + "]";
+		return "Applicant [applicantId=" + applicantId + ", username=" + username +", name=" + name + ", address=" + address + ", educationLevel="
+				+ educationLevel + ", jobsAppliedFor=" + jobsAppliedFor + "]";
 	}
 	
 	
